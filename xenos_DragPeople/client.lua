@@ -48,11 +48,11 @@ local function GetClosestPlayer(radius)
             end
         end
     end
-    if closestDistance ~= -1 and closestDistance <= radius then
-	return closestPlayer
-    else
-	return nil
-    end
+	if closestDistance ~= -1 and closestDistance <= radius then
+		return closestPlayer
+	else
+		return nil
+	end
 end
 
 local function LoadAnimDict(animDict)
@@ -66,7 +66,7 @@ local function LoadAnimDict(animDict)
 end
 
 --// Override TaskPlayAnim to unload the animation after whe have use it
-local old_TaskPlayAnim
+local old_TaskPlayAnim = TaskPlayAnim
 function TaskPlayAnim(ped, animDictionary, animationName, blendInSpeed, blendOutSpeed, duration , flag, playbackRate, lockX, lockY, lockZ)
 	old_TaskPlayAnim(ped, animDictionary, animationName, blendInSpeed, blendOutSpeed, duration , flag, playbackRate, lockX, lockY, lockZ)
 	RemoveAnimDict(animDictionary)
@@ -95,7 +95,8 @@ function WaitControlsInteractions()
 	Citizen.CreateThread(function()
 		while true do
 			HelpNotification("~INPUT_VEH_DUCK~ to drop the body")
-			if IsControlJustPressed(0, 77) then -- X
+			if IsControlJustPressed(1, 323) then -- X
+				print("Pressed X")
 				DragClosest()
 				return
 			end
@@ -113,7 +114,7 @@ function DragClosest()
 
 	if not dragging_data.InProgress then --// Dont have any drag animation started
 		local closestPlayer = GetClosestPlayer(1)
-		if closestPlayer and GetEntityHealth(closestPlayer) == 0 then
+		if closestPlayer then
 			local target = GetPlayerServerId(closestPlayer)
 			if target ~= -1 then
 				dragging_data.InProgress = true
@@ -153,7 +154,7 @@ AddEventHandler("xenos_DragPeople:syncTarget", function(target)
 
 	dragging_data.InProgress = true
 
-	SetEntityCoords(player, GetOffsetFromEntityInWorldCoords(target_ped, 0.0, 1.4, -1.0)) --// Set the player in front of the other
+	SetEntityCoords(player, GetOffsetFromEntityInWorldCoords(target_ped, 0.0, 1.2, -1.0)) --// Set the player in front of the other
 	SetEntityHeading(player, GetEntityHeading(target_ped)) --// Set same heading
 	PlayAnim("start", "ped")
 	ClearPedTasks(player) --// Added this to prevent multiple ending animation
