@@ -104,11 +104,6 @@ function WaitControlsInteractions()
 	end)
 end	
 
-FreezeEntityPosition(PlayerPedId(), false)
-SetEntityCollision(PlayerPedId(), true, true)
-ClearPedTasks(PlayerPedId())
-DetachEntity(PlayerPedId(), true, false)
-
 RegisterCommand("drag", function()
 	DragClosest()
 end)
