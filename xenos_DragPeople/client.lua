@@ -48,11 +48,11 @@ local function GetClosestPlayer(radius)
             end
         end
     end
-	if closestDistance ~= -1 and closestDistance <= radius then
-		return closestPlayer
-	else
-		return nil
-	end
+    if closestDistance ~= -1 and closestDistance <= radius then
+	return closestPlayer
+    else
+	return nil
+    end
 end
 
 local function LoadAnimDict(animDict)
