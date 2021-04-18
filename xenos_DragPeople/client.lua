@@ -9,6 +9,17 @@ local dragging_data = {
 	}
 }
 
+local ESX = nil
+
+if Config.ReloadDeath then
+	Citizen.CreateThread(function()
+		while ESX == nil do
+			TriggerEvent('esx:getSharedObject', function(obj) ESX = obj end)
+			Citizen.Wait(0)
+		end
+	end)
+end
+
 -- dragging start anim: combat@drag_ped@ / injured_pickup_back_plyr
 -- dragging during anim: combat@drag_ped@ / injured_drag_plyr
 -- dragging ending anim: combat@drag_ped@ / injured_putdown_plyr
@@ -96,7 +107,6 @@ function WaitControlsInteractions()
 		while true do
 			HelpNotification("~INPUT_VEH_DUCK~ to drop the body")
 			if IsControlJustPressed(1, 323) then -- X
-				print("Pressed X")
 				DragClosest()
 				return
 			end
@@ -112,24 +122,49 @@ end)
 function DragClosest()
 	local player = PlayerPedId()
 
+	
 	if not dragging_data.InProgress then --// Dont have any drag animation started
 		local closestPlayer = GetClosestPlayer(1)
-		if closestPlayer and GetEntityHealth(closestPlayer) == 0 then
-			local target = GetPlayerServerId(closestPlayer)
-			if target ~= -1 then
-				dragging_data.InProgress = true
-				dragging_data.target = target
+		local Ped_ClosestPlayer = GetPlayerPed(GetPlayerFromServerId(closestPlayer))
 
-				--// Play anim [start]
-				TriggerServerEvent("xenos_DragPeople:sync",target) --// Request to the other client (the closest player) to sync the animation with that client
-				PlayAnim("start", "plyr")
-				PlayAnim("loop", "plyr")
-				WaitControlsInteractions()
+		if Config.ReloadDeath then
+			ESX.TriggerServerCallback("reload_death:isPlayerDead", function(dead) 
+				if dead then
+					local target = GetPlayerServerId(closestPlayer)
+					if target ~= -1 then
+						dragging_data.InProgress = true
+						dragging_data.target = target
+
+						--// Play anim [start]
+						TriggerServerEvent("xenos_DragPeople:sync",target) --// Request to the other client (the closest player) to sync the animation with that client
+						PlayAnim("start", "plyr")
+						PlayAnim("loop", "plyr")
+						WaitControlsInteractions()
+					else
+						Notification("~r~No one nearby to drag!")
+					end
+				else
+					Notification("~r~No one nearby to drag!")
+				end
+			end, GetPlayerServerId(closestPlayer))
+		else
+			if closestPlayer and GetEntityHealth(Ped_ClosestPlayer) == 0 then
+				local target = GetPlayerServerId(closestPlayer)
+				if target ~= -1 then
+					dragging_data.InProgress = true
+					dragging_data.target = target
+
+					--// Play anim [start]
+					TriggerServerEvent("xenos_DragPeople:sync",target) --// Request to the other client (the closest player) to sync the animation with that client
+					PlayAnim("start", "plyr")
+					PlayAnim("loop", "plyr")
+					WaitControlsInteractions()
+				else
+					Notification("~r~No one nearby to drag!")
+				end
 			else
 				Notification("~r~No one nearby to drag!")
 			end
-		else
-			Notification("~r~No one nearby to drag!")
 		end
 	else --// Have a drag animation started
 		local target_ped = GetPlayerPed(GetPlayerFromServerId(dragging_data.target))
