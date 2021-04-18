@@ -114,7 +114,7 @@ function DragClosest()
 
 	if not dragging_data.InProgress then --// Dont have any drag animation started
 		local closestPlayer = GetClosestPlayer(1)
-		if closestPlayer and GetEntityHealth(closestPlayer) then
+		if closestPlayer and GetEntityHealth(closestPlayer) == 0 then
 			local target = GetPlayerServerId(closestPlayer)
 			if target ~= -1 then
 				dragging_data.InProgress = true
