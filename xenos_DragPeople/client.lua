@@ -148,7 +148,7 @@ function DragClosest()
 				end
 			end, GetPlayerServerId(closestPlayer))
 		else
-			if closestPlayer and GetEntityHealth(Ped_ClosestPlayer) == 0 then
+			if closestPlayer and IsPedDeadOrDying(closestPlayer) then
 				local target = GetPlayerServerId(closestPlayer)
 				if target ~= -1 then
 					dragging_data.InProgress = true
