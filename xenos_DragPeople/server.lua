@@ -3,7 +3,10 @@ local dragged = {}
 
 RegisterServerEvent("xenos_DragPeople:sync")
 AddEventHandler("xenos_DragPeople:sync", function(targetSrc)
-    if targetSrc > 0 and #(GetPlayerPed(source) - GetPlayerPed(targetSrc)) < 20.0 then
+	local sourceEntity = GetPlayerPed(source)
+	local targetEntity = GetPlayerPed(targetSrc)
+	local distanceBetweenPlayers =  #(GetEntityCoords(sourceEntity) - GetEntityCoords(targetEntity))
+	if targetSrc > 0 and distanceBetweenPlayers < 20.0 then
         if Config.ReloadDeath then
             TriggerClientEvent("reload_death:stopAnim", targetSrc)
         end
